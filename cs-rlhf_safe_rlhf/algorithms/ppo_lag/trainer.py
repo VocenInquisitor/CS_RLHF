@@ -507,3 +507,4 @@ class PPOLagTrainer(RLTrainer):
             'train/mean_generated_length': mean_generated_length.item(),
             'train/max_generated_length': max_generated_length.item(),
         }
+

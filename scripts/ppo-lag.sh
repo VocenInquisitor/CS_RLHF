@@ -15,6 +15,10 @@
 # limitations under the License.
 # ==============================================================================
 
+module load bright
+module load gcc/11.2.0
+#########################
+
 if [ -z "${BASH_VERSION}" ]; then
 	echo "Please use bash to run this script." >&2
 	exit 1
@@ -23,13 +27,19 @@ fi
 set -x
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" &>/dev/null && pwd)"
+#echo "The Script directory is$"${SCRIPT_DIR}
 ROOT_DIR="$(dirname "${SCRIPT_DIR}")"
+#echo "The Script directory is$"${ROOT_DIR}
 export PYTHONPATH="${ROOT_DIR}${PYTHONPATH:+:${PYTHONPATH}}"
 export LOGLEVEL="${LOGLEVEL:-WARNING}"
 
+#export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:128
+export PYTORCH_CUDA_ALLOC_CONF="garbage_collection_threshold:0.9,max_split_size_mb:512"
+export DEEPSPEED_ACTIVATION_CHECKPOINTING=1
+
+
 ACTOR_MODEL_NAME_OR_PATH="PKU-Alignment/alpaca-7b-reproduced"
-REWARD_MODEL_NAME_OR_PATH="${ROOT_DIR}/output/rm"
-COST_MODEL_NAME_OR_PATH="${ROOT_DIR}/output/cm"
+0
 unset {REWARD,COST}_CRITIC_MODEL_NAME_OR_PATH
 OUTPUT_DIR="${ROOT_DIR}/output/ppo-lag"
 unset HOSTFILE
@@ -102,6 +112,7 @@ while [[ "$#" -gt 0 ]]; do
 		--offload=*)
 			OFFLOAD="${arg#*=}"
 			;;
+
 		*)
 			echo "Unknown parameter passed: '${arg}'" >&2
 			exit 1
@@ -162,9 +173,9 @@ deepspeed "${DEEPSPEED_ARGS[@]}" \
 	--trust_remote_code True \
 	--epochs 1 \
 	--update_iters 1 \
-	--per_device_prompt_batch_size 16 \
-	--per_device_train_batch_size 16 \
-	--gradient_accumulation_steps 1 \
+	--per_device_prompt_batch_size 4 \
+	--per_device_train_batch_size 4 \
+	--gradient_accumulation_steps 8 \
 	--actor_lr 1e-5 \
 	--actor_weight_decay 0.01 \
 	--actor_lr_scheduler_type cosine \
@@ -178,10 +189,10 @@ deepspeed "${DEEPSPEED_ARGS[@]}" \
 	--normalize_reward False \
 	--normalize_cost False \
 	--seed 42 \
-	--threshold 0.0 \
-	--lambda_init 1.0 \
-	--lambda_lr 0.1 \
-	--lambda_max 5.0 \
+	--threshold -0.4 \
+	--lambda_init 20.0 \
+	--lambda_lr 1.0 \
+	--lambda_max 20.0 \
 	--lambda_update_delay_steps 0 \
 	--episode_cost_window_size 128 \
 	--kl_coeff 0.01 \

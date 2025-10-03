@@ -1,3 +1,4 @@
+
 # Copyright 2023-2024 PKU-Alignment Team. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +24,7 @@ import deepspeed
 import numpy as np
 import torch
 import torch.distributed as dist
-from transformers import AutoConfig, PreTrainedTokenizerBase
+from transformers import PreTrainedTokenizerBase
 
 from safe_rlhf.models import AutoModelForScore, load_pretrained_models
 from safe_rlhf.trainers import RLTrainer
@@ -37,7 +38,6 @@ from safe_rlhf.utils import (
     masked_mean,
 )
 
-#from BCE_cost_model.safety_model import SafetyCostModel
 
 class PPOLagTrainer(RLTrainer):
     TRAINING_TYPE = 'ppo_lag'
@@ -69,7 +69,6 @@ class PPOLagTrainer(RLTrainer):
 
     def init_models(self) -> None:
         super().init_models()
-########################################################        
         self.cost_model, self.cost_tokenizer = load_pretrained_models(
             self.args.cost_model_name_or_path,
             model_max_length=self.args.max_length,
@@ -81,18 +80,14 @@ class PPOLagTrainer(RLTrainer):
                 'do_normalize': self.args.normalize_cost,
             },
         )
-
-        
         self.cost_model.set_normalize(self.args.normalize_cost)
 
         if self.args.cost_critic_model_name_or_path is None:
             self.args.cost_critic_model_name_or_path = self.args.cost_model_name_or_path
-  
         self.cost_critic_model, self.cost_critic_tokenizer = load_pretrained_models(
             self.args.cost_critic_model_name_or_path,
             model_max_length=self.args.max_length,
             auto_model_type=AutoModelForScore,
-            #auto_model_type=cost_critic_model_type,
             padding_side='left',
             trust_remote_code=self.args.trust_remote_code,
             auto_model_kwargs={
@@ -320,17 +315,16 @@ class PPOLagTrainer(RLTrainer):
 
         dist.reduce(episode_cost, dst=0, op=dist.ReduceOp.AVG)
 
-        # if is_main_process() and self.global_step >= self.lambda_update_delay_steps:
-        #     lambda_loss = -torch.nn.functional.relu(episode_cost - self.threshold) * self.log_lambda.exp()
-        #     #lambda_loss = -(episode_cost - self.threshold) * self.log_lambda.exp()
-        #     self.log_lambda_optimizer.zero_grad()
-        #     lambda_loss.backward()
-        #     self.log_lambda_optimizer.step()
-        #     if self.log_lambda_max is not None:
-        #         with torch.no_grad():
-        #             self.log_lambda.clamp_(max=self.log_lambda_max)
+        if is_main_process() and self.global_step >= self.lambda_update_delay_steps:
+            lambda_loss = -(episode_cost - self.threshold) * self.log_lambda.exp()
+            self.log_lambda_optimizer.zero_grad()
+            lambda_loss.backward()
+            self.log_lambda_optimizer.step()
+            if self.log_lambda_max is not None:
+                with torch.no_grad():
+                    self.log_lambda.clamp_(max=self.log_lambda_max)
 
-        #dist.broadcast(self.log_lambda, src=0)
+        dist.broadcast(self.log_lambda, src=0)
 
         prompt = rl_batch['prompt']
         old_log_probs = rl_batch['log_probs']
@@ -400,18 +394,14 @@ class PPOLagTrainer(RLTrainer):
             use_cache=False,
         ).scores
         cost_values = cost_values.squeeze(dim=-1)[:, :-1]
-        cost_critic_loss = torch.nn.functional.relu(self.critic_loss_fn(
+        cost_critic_loss = self.critic_loss_fn(
             cost_values[:, start:],
             old_cost_values[:, start:],
             cost_returns,
             sequence_mask[:, start:],
-        ))
+        )
         self.cost_critic_model.backward(cost_critic_loss)
         self.cost_critic_model.step()
-        #torch.save(self.actor_model,"Actor_Model_latest")
-        #torch.save(self.reward_critic_model,"Reward_critic_model_latest")
-        #torch.save(self.cost_critic_model,"Cost_critic_model_latest")
-        #self._maybe_save_models()
 
         with torch.no_grad():
             mask = sequence_mask[:, start:]
@@ -473,4 +463,3 @@ class PPOLagTrainer(RLTrainer):
             'train/mean_generated_length': mean_generated_length.item(),
             'train/max_generated_length': max_generated_length.item(),
         }
-

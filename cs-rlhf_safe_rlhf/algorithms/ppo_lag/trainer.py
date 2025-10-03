@@ -81,47 +81,13 @@ class PPOLagTrainer(RLTrainer):
                 'do_normalize': self.args.normalize_cost,
             },
         )
-        # config = AutoConfig.from_pretrained(
-        #     self.args.cost_model_name_or_path,
-        #     trust_remote_code=self.args.trust_remote_code,
-        # )
-        # if config.model_type == "BCE_cost_model":
-        #     print("[INFO] ✅ Using custom SafetyCostModel for cost_model")
-        #     cost_model_type = SafetyCostModel
-        # else:
-        #     cost_model_type = AutoModelForScore
 
-        # self.cost_model, self.cost_tokenizer = load_pretrained_models(
-        #     self.args.cost_model_name_or_path,
-        #     model_max_length=self.args.max_length,
-        #     auto_model_type=cost_model_type,
-        #     padding_side='right',
-        #     trust_remote_code=self.args.trust_remote_code,
-        #     auto_model_kwargs={
-        #         'score_type': 'cost',
-        #         'do_normalize': self.args.normalize_cost,
-        #     },
-        # )
-
-##########################################################
         
         self.cost_model.set_normalize(self.args.normalize_cost)
 
         if self.args.cost_critic_model_name_or_path is None:
             self.args.cost_critic_model_name_or_path = self.args.cost_model_name_or_path
-
-###################### My Added Code ########################
-        # critic_config = AutoConfig.from_pretrained(
-        #     self.args.cost_critic_model_name_or_path,
-        #     trust_remote_code=self.args.trust_remote_code,
-        # )
-        # if critic_config.model_type == "BCE_cost_model":
-        #     print("[INFO] ✅ Using custom SafetyCostModel for cost_critic_model")
-        #     cost_critic_model_type = SafetyCostModel
-        # else:
-        #     cost_critic_model_type = AutoModelForScore
-
-###########################################################        
+  
         self.cost_critic_model, self.cost_critic_tokenizer = load_pretrained_models(
             self.args.cost_critic_model_name_or_path,
             model_max_length=self.args.max_length,

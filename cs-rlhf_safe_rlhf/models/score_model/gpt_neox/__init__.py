@@ -13,4 +13,4 @@
 # limitations under the License.
 # ==============================================================================
 
-from safe_rlhf.models.score_model.gpt_neo.modeling_gpt_neo import GPTNeoForScore
+from safe_rlhf.models.score_model.gpt_neox.modeling_gpt_neox import GPTNeoXForScore

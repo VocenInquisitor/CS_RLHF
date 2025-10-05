@@ -1,4 +1,4 @@
-**Certifiably Safe Reinforcement Learning from Human Feedback (CS-RLHF)**
+##Certifiably Safe Reinforcement Learning from Human Feedback (CS-RLHF)##
 
 CS-RLHF is an RLHF framework designed to provide deterministic safety guarantees for large language models.
 It extends beyond Safe-RLHF by introducing certifiable safety enforcement and a cost model that score the response accurately and does not trigger the score based on keywords, ensuring safety against jailbreaks and adversarial prompts while maintaining model helpfulness.

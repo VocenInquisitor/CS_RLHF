@@ -149,6 +149,7 @@ scripts/arena-evaluation.sh \
     --cost_model_name_or_path output/cm \
     --output_dir output/arena-evaluation
 ```
+
 Jailbreak Benchmark:
 
 ```bash

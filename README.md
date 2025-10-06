@@ -16,3 +16,8 @@ Improved safety against jailbreak attacks and covert unsafe responses.
 Support for multi-GPU training with DeepSpeed ZeRO-3, offloading, and LoRA/QLoRA efficiency.
 
 Evaluation scripts for safety, helpfulness, and robustness trade-offs.
+
+git clone [https://github.com/<anon-org>/cs-rlhf.git](https://github.com/VocenInquisitor/CS_RLHF.git)
+cd cs-rlhf
+conda env create --file conda-recipe.yaml
+conda activate cs-rlhf

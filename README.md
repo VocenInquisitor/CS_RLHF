@@ -97,7 +97,7 @@ bash scripts/cs-rlhf.sh \
 
 ## ⚙️ Computational Requirements
 
-Tested with LLaMA-7B on servers with 8 × A100-80GB GPUs.
+Tested with LLaMA-7B on servers with 4 × A100-80GB GPUs.
 
 For lower GPU memory, enable DeepSpeed ZeRO-Offload:
 

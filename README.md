@@ -12,3 +12,9 @@ Clone the source code from GitHub:
 ```bash
 [git clone https://github.com/VocenInquisitor/CS_RLHF.git]
 cd cs-rlhf
+```
+
+## Native Runner: Setup a conda environment using conda / mamba:
+```bash
+conda env create --file conda-recipe.yaml
+```

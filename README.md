@@ -18,3 +18,11 @@ cd cs-rlhf
 ```bash
 conda env create --file conda-recipe.yaml
 ```
+This will automatically install all dependencies.
+
+## Containerized Runner: You can also run with Docker.
+First, set up NVIDIA Container Toolkitand nvidia-docker. Then run:
+
+```bash
+make docker-run
+```

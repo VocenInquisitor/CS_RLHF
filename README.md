@@ -1,23 +1,6 @@
-**Certifiably Safe Reinforcement Learning from Human Feedback (CS-RLHF)**
+# Certifiably Safe Reinforcement Learning from Human Feedback (CS-RLHF)
 
-CS-RLHF is an RLHF framework designed to provide deterministic safety guarantees for large language models.
-It extends beyond Safe-RLHF by introducing certifiable safety enforcement and a cost model that score the response accurately and does not trigger the score based on keywords, ensuring safety against jailbreaks and adversarial prompts while maintaining model helpfulness.
+CS-RLHF is an RLHF framework for **certifiably safe alignment of large language models (LLMs)**.  
+Unlike standard Safe-RLHF, which relies on Lagrangian multipliers, CS-RLHF enforces **safety guarantees** via **rectified penalty-based optimization** and a **cost model that does not score the response based on keywords**.  
 
-Key features of CS-RLHF:
-
-End-to-end support for SFT, Reward & Cost Model training, and CS-RLHF training.
-
-A cost model that prioritizes meaning over superficial keywords.
-
-Certifiable optimization using rectified penalties instead of fragile dual-variable tuning.
-
-Improved safety against jailbreak attacks and covert unsafe responses.
-
-Support for multi-GPU training with DeepSpeed ZeRO-3, offloading, and LoRA/QLoRA efficiency.
-
-Evaluation scripts for safety, helpfulness, and robustness trade-offs.
-
-git clone [https://github.com/<anon-org>/cs-rlhf.git](https://github.com/VocenInquisitor/CS_RLHF.git)
-cd cs-rlhf
-conda env create --file conda-recipe.yaml
-conda activate cs-rlhf
+The framework provides end-to-end support for **SFT, Reward & Cost model training, RLHF, and CS-RLHF alignment training**, with benchmarks for **safety, helpfulness, and robustness against jailbreak attacks**.
